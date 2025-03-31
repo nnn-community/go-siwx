@@ -8,8 +8,14 @@ import (
     "os"
 )
 
-func New(config Config) *fiber.App {
-    app := fiber.New(config.Fiber)
+func New(config ...Config) *fiber.App {
+    cfg := Config{}
+
+    if len(config) > 0 {
+        cfg = config[0]
+    }
+
+    app := fiber.New(cfg.Fiber)
 
     app.Use(cors.New(cors.Config{
         AllowOriginsFunc: func(_ string) bool {
@@ -19,7 +25,7 @@ func New(config Config) *fiber.App {
         AllowCredentials: true,
     }))
 
-    app.Use(registerRedis(config.Redis))
+    app.Use(registerRedis(cfg.Redis))
 
     app.Use(registerSiwx())
 
