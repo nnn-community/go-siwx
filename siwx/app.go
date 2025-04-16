@@ -58,7 +58,7 @@ func registerRedis(cfg Redis) fiber.Handler {
 func registerSiwx() fiber.Handler {
     return func(c *fiber.Ctx) error {
         rs := c.Locals("redis").(*redis.Storage)
-        sid := c.Cookies("connect.sid")
+        sid := c.Cookies("sessionId")
         user, _ := getSessionUser(rs, sid)
 
         c.Locals("siwx", user)

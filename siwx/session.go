@@ -10,7 +10,7 @@ import (
 )
 
 type sessionData struct {
-    SiwxUser *User `json:"siwxUser"`
+    SiwxUser *User `json:"siwx-user"`
 }
 
 var unauthorizedUser = User{
@@ -28,19 +28,13 @@ func getSessionUser(r *redis.Storage, sessionId string) (User, error) {
         return unauthorizedUser, err
     }
 
-    parts := strings.SplitN(decoded, ".", 2)
+    parts := strings.Split(decoded, ".")
 
-    if len(parts) != 2 {
+    if len(parts) < 1 {
         return unauthorizedUser, errors.New("invalid cookie format")
     }
 
-    exp := strings.SplitN(parts[0], ":", 2)
-
-    if len(parts) != 2 {
-        return unauthorizedUser, errors.New("invalid cookie format")
-    }
-
-    s, err := r.Get("sess:" + exp[1])
+    s, err := r.Get("sess:" + parts[0])
 
     if err != nil {
         return unauthorizedUser, err
