@@ -22,8 +22,8 @@ func main() {
     })
 
     // Use middleware to validate user (sends error 401 if unauthenticated)
-    app.Post("/save-user", siwx.Middleware, func(c *fiber.Ctx) error {
-        user := c.Locals("siwx").(siwx.User)
+    app.Post("/save-profile", siwx.Middleware, func(c *fiber.Ctx) error {
+        user := siwx.GetUser(c)
 
         fmt.Println("logged user:", user)
         fmt.Println("is admin:", user.Can([]string{"is-admin"}))

@@ -10,7 +10,13 @@ import (
 )
 
 type sessionData struct {
+    Siwx     *Siwx `json:"siwx"`
     SiwxUser *User `json:"siwx-user"`
+}
+
+var unauthorizedSiwx = Siwx{
+    Address: "",
+    ChainId: 0,
 }
 
 var unauthorizedUser = User{
@@ -21,41 +27,72 @@ var unauthorizedUser = User{
     UserData:    nil,
 }
 
+var unauthorizedSession = sessionData{
+    Siwx:     &unauthorizedSiwx,
+    SiwxUser: &unauthorizedUser,
+}
+
+func getSessionSiwx(r *redis.Storage, sessionId string) (Siwx, error) {
+    data, err := getSession(r, sessionId)
+
+    return *data.Siwx, err
+}
+
 func getSessionUser(r *redis.Storage, sessionId string) (User, error) {
+    data, err := getSession(r, sessionId)
+    user := *data.SiwxUser
+
+    if err == nil {
+        user.IsLoggedIn = true
+    }
+
+    return user, err
+}
+
+func parseSessionId(sessionId string) (*string, error) {
     decoded, err := url.QueryUnescape(sessionId)
 
     if err != nil {
-        return unauthorizedUser, err
+        return nil, err
     }
 
     parts := strings.Split(decoded, ".")
 
     if len(parts) < 1 {
-        return unauthorizedUser, errors.New("invalid cookie format")
+        return nil, errors.New("invalid cookie format")
     }
 
-    s, err := r.Get("sess:" + parts[0])
+    id := "sess:" + parts[0]
+
+    return &id, nil
+}
+
+func getSession(r *redis.Storage, sessionId string) (sessionData, error) {
+    sessId, err := parseSessionId(sessionId)
 
     if err != nil {
-        return unauthorizedUser, err
+        return unauthorizedSession, err
+    }
+
+    s, err := r.Get(*sessId)
+
+    if err != nil {
+        return unauthorizedSession, err
     }
 
     if string(s) == "" {
-        return unauthorizedUser, fmt.Errorf("empty JSON string")
+        return unauthorizedSession, fmt.Errorf("empty JSON string")
     }
 
     var data sessionData
 
     if err := json.Unmarshal(s, &data); err != nil {
-        return unauthorizedUser, fmt.Errorf("invalid JSON: %w", err)
+        return unauthorizedSession, fmt.Errorf("invalid JSON: %w", err)
     }
 
     if data.SiwxUser == nil {
-        return unauthorizedUser, fmt.Errorf("siwxUser field missing")
+        return unauthorizedSession, fmt.Errorf("siwxUser field missing")
     }
 
-    user := *data.SiwxUser
-    user.IsLoggedIn = true
-
-    return user, nil
+    return data, nil
 }
