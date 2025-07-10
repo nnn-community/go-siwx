@@ -9,8 +9,8 @@ type Permission struct {
     Name             string `gorm:"type:varchar(32);unique"`
     GroupPermissions []GroupPermission
     UserPermissions  []UserPermission
-    CreatedAt        time.Time `gorm:"column:created_at"`
-    UpdatedAt        time.Time `gorm:"column:updated_at"`
+    CreatedAt        time.Time `gorm:"column:created_at;autoCreateTime"`
+    UpdatedAt        time.Time `gorm:"column:updated_at;autoUpdateTime"`
 }
 
 func (Permission) TableName() string {
@@ -23,8 +23,8 @@ type Group struct {
     GroupPermissions []GroupPermission
     Users            []User
     IsDefault        bool      `gorm:"default:false;column:default;index:,type:HASH"`
-    CreatedAt        time.Time `gorm:"column:created_at"`
-    UpdatedAt        time.Time `gorm:"column:updated_at"`
+    CreatedAt        time.Time `gorm:"column:created_at;autoCreateTime"`
+    UpdatedAt        time.Time `gorm:"column:updated_at;autoUpdateTime"`
 }
 
 func (Group) TableName() string {
@@ -37,8 +37,8 @@ type GroupPermission struct {
     Group        Group
     PermissionID string `gorm:"type:varchar(36);column:permission_id;uniqueIndex:group_permission_identifier;index:,type:HASH"`
     Permission   Permission
-    CreatedAt    time.Time `gorm:"column:created_at"`
-    UpdatedAt    time.Time `gorm:"column:updated_at"`
+    CreatedAt    time.Time `gorm:"column:created_at;autoCreateTime"`
+    UpdatedAt    time.Time `gorm:"column:updated_at;autoUpdateTime"`
 }
 
 func (GroupPermission) TableName() string {
@@ -51,8 +51,8 @@ type UserPermission struct {
     User         User
     PermissionID string `gorm:"type:varchar(36);column:permission_id;uniqueIndex:user_permission_identifier;index:,type:HASH"`
     Permission   Permission
-    CreatedAt    time.Time `gorm:"column:created_at"`
-    UpdatedAt    time.Time `gorm:"column:updated_at"`
+    CreatedAt    time.Time `gorm:"column:created_at;autoCreateTime"`
+    UpdatedAt    time.Time `gorm:"column:updated_at;autoUpdateTime"`
 }
 
 func (UserPermission) TableName() string {
@@ -66,8 +66,8 @@ type User struct {
     GroupID         string `gorm:"type:varchar(36);column:group_id;index:,type:HASH"`
     Group           Group
     Active          bool      `gorm:"default:true;index:,type:HASH"`
-    CreatedAt       time.Time `gorm:"column:created_at"`
-    UpdatedAt       time.Time `gorm:"column:updated_at"`
+    CreatedAt       time.Time `gorm:"column:created_at;autoCreateTime"`
+    UpdatedAt       time.Time `gorm:"column:updated_at;autoUpdateTime"`
 }
 
 func (User) TableName() string {
@@ -80,8 +80,8 @@ type UserAddress struct {
     UserID    string `gorm:"type:varchar(36);column:user_id;index:,type:HASH"`
     User      User
     Master    bool      `gorm:"default:false;index:,type:HASH"`
-    CreatedAt time.Time `gorm:"column:created_at"`
-    UpdatedAt time.Time `gorm:"column:updated_at"`
+    CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+    UpdatedAt time.Time `gorm:"column:updated_at;autoUpdateTime"`
 }
 
 func (UserAddress) TableName() string {
