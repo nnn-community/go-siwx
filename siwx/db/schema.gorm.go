@@ -5,12 +5,12 @@ import (
 )
 
 type Permission struct {
-    ID               string `gorm:"type:varchar(36);primaryKey;default:uuid_generate_v4()"`
+    ID               string `gorm:"type:varchar(36);primaryKey;default:gen_random_uuid();index:,type:HASH"`
     Name             string `gorm:"type:varchar(32);unique"`
     GroupPermissions []GroupPermission
     UserPermissions  []UserPermission
-    CreatedAt        time.Time
-    UpdatedAt        time.Time
+    CreatedAt        time.Time `gorm:"column:created_at"`
+    UpdatedAt        time.Time `gorm:"column:updated_at"`
 }
 
 func (Permission) TableName() string {
@@ -18,13 +18,13 @@ func (Permission) TableName() string {
 }
 
 type Group struct {
-    ID               string `gorm:"type:varchar(36);primaryKey;default:uuid_generate_v4()"`
+    ID               string `gorm:"type:varchar(36);primaryKey;default:gen_random_uuid();index:,type:HASH"`
     Name             string `gorm:"unique"`
     GroupPermissions []GroupPermission
     Users            []User
-    IsDefault        bool `gorm:"default:false;column:default"`
-    CreatedAt        time.Time
-    UpdatedAt        time.Time
+    IsDefault        bool      `gorm:"default:false;column:default;index:,type:HASH"`
+    CreatedAt        time.Time `gorm:"column:created_at"`
+    UpdatedAt        time.Time `gorm:"column:updated_at"`
 }
 
 func (Group) TableName() string {
@@ -32,13 +32,13 @@ func (Group) TableName() string {
 }
 
 type GroupPermission struct {
-    ID           string `gorm:"type:varchar(36);primaryKey;default:uuid_generate_v4()"`
-    GroupID      string `gorm:"type:varchar(36);uniqueIndex:group_permission_identifier"`
+    ID           string `gorm:"type:varchar(36);primaryKey;default:gen_random_uuid();index:,type:HASH"`
+    GroupID      string `gorm:"type:varchar(36);column:group_id;uniqueIndex:group_permission_identifier;index:,type:HASH"`
     Group        Group
-    PermissionID string `gorm:"type:varchar(36);uniqueIndex:group_permission_identifier"`
+    PermissionID string `gorm:"type:varchar(36);column:permission_id;uniqueIndex:group_permission_identifier;index:,type:HASH"`
     Permission   Permission
-    CreatedAt    time.Time
-    UpdatedAt    time.Time
+    CreatedAt    time.Time `gorm:"column:created_at"`
+    UpdatedAt    time.Time `gorm:"column:updated_at"`
 }
 
 func (GroupPermission) TableName() string {
@@ -46,13 +46,13 @@ func (GroupPermission) TableName() string {
 }
 
 type UserPermission struct {
-    ID           string `gorm:"type:varchar(36);primaryKey;default:uuid_generate_v4()"`
-    UserID       string `gorm:"type:varchar(36);uniqueIndex:user_permission_identifier"`
+    ID           string `gorm:"type:varchar(36);primaryKey;default:gen_random_uuid();index:,type:HASH"`
+    UserID       string `gorm:"type:varchar(36);column:user_id;uniqueIndex:user_permission_identifier;index:,type:HASH"`
     User         User
-    PermissionID string `gorm:"type:varchar(36);uniqueIndex:user_permission_identifier"`
+    PermissionID string `gorm:"type:varchar(36);column:permission_id;uniqueIndex:user_permission_identifier;index:,type:HASH"`
     Permission   Permission
-    CreatedAt    time.Time
-    UpdatedAt    time.Time
+    CreatedAt    time.Time `gorm:"column:created_at"`
+    UpdatedAt    time.Time `gorm:"column:updated_at"`
 }
 
 func (UserPermission) TableName() string {
@@ -60,14 +60,14 @@ func (UserPermission) TableName() string {
 }
 
 type User struct {
-    ID              string `gorm:"type:varchar(36);primaryKey;default:uuid_generate_v4()"`
+    ID              string `gorm:"type:varchar(36);primaryKey;default:gen_random_uuid();index:,type:HASH"`
     Addresses       []UserAddress
     UserPermissions []UserPermission
-    GroupID         string `gorm:"type:varchar(36)"`
+    GroupID         string `gorm:"type:varchar(36);column:group_id;index:,type:HASH"`
     Group           Group
-    Active          bool `gorm:"default:true"`
-    CreatedAt       time.Time
-    UpdatedAt       time.Time
+    Active          bool      `gorm:"default:true;index:,type:HASH"`
+    CreatedAt       time.Time `gorm:"column:created_at"`
+    UpdatedAt       time.Time `gorm:"column:updated_at"`
 }
 
 func (User) TableName() string {
@@ -75,13 +75,13 @@ func (User) TableName() string {
 }
 
 type UserAddress struct {
-    ID        string `gorm:"type:varchar(36);primaryKey;default:uuid_generate_v4()"`
-    Address   string `gorm:"type:varchar(42);unique"`
-    UserID    string `gorm:"type:varchar(36)"`
+    ID        string `gorm:"type:varchar(36);primaryKey;default:gen_random_uuid();index:,type:HASH"`
+    Address   string `gorm:"type:varchar(42);unique;index:,type:HASH"`
+    UserID    string `gorm:"type:varchar(36);column:user_id;index:,type:HASH"`
     User      User
-    Master    bool `gorm:"default:false"`
-    CreatedAt time.Time
-    UpdatedAt time.Time
+    Master    bool      `gorm:"default:false;index:,type:HASH"`
+    CreatedAt time.Time `gorm:"column:created_at"`
+    UpdatedAt time.Time `gorm:"column:updated_at"`
 }
 
 func (UserAddress) TableName() string {

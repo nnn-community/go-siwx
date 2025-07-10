@@ -9,7 +9,7 @@ $$ language 'plpgsql';
 
 -- Permissions Table
 CREATE TABLE "permissions" (
-    "id" VARCHAR(36) PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" VARCHAR(36) PRIMARY KEY DEFAULT gen_random_uuid(),
     "name" VARCHAR(32) UNIQUE NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -19,18 +19,19 @@ CREATE TRIGGER update_permissions_updated_at BEFORE UPDATE ON "permissions" FOR 
 
 -- Groups Table
 CREATE TABLE "groups" (
-    "id" VARCHAR(36) PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" VARCHAR(36) PRIMARY KEY DEFAULT gen_random_uuid(),
     "name" VARCHAR(255) UNIQUE NOT NULL,
     "default" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "updated_at" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX ON "groups" USING HASH ("id");
+CREATE INDEX ON "groups" USING HASH ("default");
 CREATE TRIGGER update_groups_updated_at BEFORE UPDATE ON "groups" FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
 -- Users Table
 CREATE TABLE "users" (
-    "id" VARCHAR(36) PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" VARCHAR(36) PRIMARY KEY DEFAULT gen_random_uuid(),
     "group_id" VARCHAR(36) NOT NULL,
     "active" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -44,7 +45,7 @@ CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON "users" FOR EACH ROW EXE
 
 -- Group Permissions Table
 CREATE TABLE "group_permissions" (
-    "id" VARCHAR(36) PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" VARCHAR(36) PRIMARY KEY DEFAULT gen_random_uuid(),
     "group_id" VARCHAR(36) NOT NULL,
     "permission_id" VARCHAR(36) NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -60,7 +61,7 @@ CREATE TRIGGER update_group_permissions_updated_at BEFORE UPDATE ON "group_permi
 
 -- User Permissions Table
 CREATE TABLE "user_permissions" (
-    "id" VARCHAR(36) PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" VARCHAR(36) PRIMARY KEY DEFAULT gen_random_uuid(),
     "user_id" VARCHAR(36) NOT NULL,
     "permission_id" VARCHAR(36) NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -76,7 +77,7 @@ CREATE TRIGGER update_user_permissions_updated_at BEFORE UPDATE ON "user_permiss
 
 -- User Addresses Table
 CREATE TABLE "user_addresses" (
-    "id" VARCHAR(36) PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "id" VARCHAR(36) PRIMARY KEY DEFAULT gen_random_uuid(),
     "address" VARCHAR(42) UNIQUE NOT NULL,
     "user_id" VARCHAR(36) NOT NULL,
     "master" BOOLEAN NOT NULL DEFAULT false,
