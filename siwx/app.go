@@ -2,8 +2,13 @@ package siwx
 
 import (
     "github.com/gofiber/fiber/v2"
+    "github.com/nnn-community/go-siwx/siwx/cors"
+    "github.com/nnn-community/go-siwx/siwx/db"
+    "github.com/nnn-community/go-siwx/siwx/redis"
+    "os"
 )
 
+// Creates a new Fiber instance with GORM database with all required plugins for authentication process.
 func New(config ...Config) *fiber.App {
     cfg := Config{}
 
@@ -11,11 +16,18 @@ func New(config ...Config) *fiber.App {
         cfg = config[0]
     }
 
-    app := fiber.New(cfg.Fiber)
+    if cfg.DatabaseUrl == "" {
+        cfg.DatabaseUrl = os.Getenv("DATABASE_URL")
+    }
 
-    app.Use(registerCors())
-    app.Use(registerRedis(cfg.Redis))
+    app := fiber.New(cfg.Fiber)
+    db.Connect(cfg.DatabaseUrl)
+
+    app.Use(cors.Register())
+    app.Use(redis.Register(cfg.Redis))
     app.Use(registerSiwx())
+
+    setRoutes(app, cfg)
 
     return app
 }

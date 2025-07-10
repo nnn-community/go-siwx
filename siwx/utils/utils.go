@@ -1,4 +1,4 @@
-package siwx
+package utils
 
 import (
     "errors"
