@@ -11,6 +11,7 @@ func Register() fiber.Handler {
             return true
         },
         AllowMethods:     "GET,HEAD,POST,PUT,DELETE,OPTIONS,PATCH",
+        AllowHeaders:     "Origin, Content-Type, Accept, Authorization, Upgrade, Connection, Sec-WebSocket-Key, Sec-WebSocket-Version, Sec-WebSocket-Extensions",
         AllowCredentials: true,
     })
 }
