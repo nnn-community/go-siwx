@@ -53,7 +53,6 @@ func setRoutes(app *fiber.App, cfg Config) {
             return c.SendStatus(fiber.StatusUnauthorized)
         }
 
-        rs := redis.Get(c)
         sid := session.GetId(c)
         u, err := user.GetByAddress(v.Result.Address, cfg.GetUserData)
 
@@ -91,7 +90,7 @@ func setRoutes(app *fiber.App, cfg Config) {
         })
 
         c.Cookie(&cookieCfg)
-        rs.Set(sid, sessionData, cfg.CookieDuration)
+        redis.Store.Set(sid, sessionData, cfg.CookieDuration)
 
         return c.Status(fiber.StatusOK).JSON(true)
     })

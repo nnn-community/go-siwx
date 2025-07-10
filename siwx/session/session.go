@@ -30,8 +30,7 @@ var Unauthorized = Data{
 
 func Get(c *fiber.Ctx) Data {
     sessId := GetId(c)
-    rs := redis.Get(c)
-    s, err := rs.Get(sessId)
+    s, err := redis.Store.Get(sessId)
 
     if err != nil {
         return Unauthorized
@@ -68,6 +67,5 @@ func GetId(c *fiber.Ctx) string {
 
 func Delete(c *fiber.Ctx) {
     sessId := GetId(c)
-    rs := redis.Get(c)
-    rs.Delete(sessId)
+    redis.Store.Delete(sessId)
 }

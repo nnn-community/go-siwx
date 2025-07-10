@@ -2,7 +2,6 @@ package redis
 
 import (
     "fmt"
-    "github.com/gofiber/fiber/v2"
     redisp "github.com/gofiber/storage/redis/v3"
     "os"
 )
@@ -19,29 +18,21 @@ type Config struct {
     DB string `json:"db"`
 }
 
-func Register(cfg Config) fiber.Handler {
-    return func(c *fiber.Ctx) error {
-        redisUrl := os.Getenv("REDIS_URL")
-        redisDb := os.Getenv("REDIS_DB")
+var Store *redisp.Storage
 
-        if cfg.Url != "" {
-            redisUrl = cfg.Url
-        }
+func Register(cfg Config) {
+    redisUrl := os.Getenv("REDIS_URL")
+    redisDb := os.Getenv("REDIS_DB")
 
-        if cfg.DB != "" {
-            redisDb = cfg.DB
-        }
-
-        redisStorage := redisp.New(redisp.Config{
-            URL: fmt.Sprintf("%s/%s", redisUrl, redisDb),
-        })
-
-        c.Locals("redis", redisStorage)
-
-        return c.Next()
+    if cfg.Url != "" {
+        redisUrl = cfg.Url
     }
-}
 
-func Get(c *fiber.Ctx) *redisp.Storage {
-    return c.Locals("redis").(*redisp.Storage)
+    if cfg.DB != "" {
+        redisDb = cfg.DB
+    }
+
+    Store = redisp.New(redisp.Config{
+        URL: fmt.Sprintf("%s/%s", redisUrl, redisDb),
+    })
 }

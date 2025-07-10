@@ -5,6 +5,7 @@ import (
     "github.com/nnn-community/go-siwx/siwx/cors"
     "github.com/nnn-community/go-siwx/siwx/db"
     "github.com/nnn-community/go-siwx/siwx/redis"
+    "github.com/nnn-community/go-siwx/siwx/session"
     "github.com/nnn-community/go-utils/env"
     "os"
 )
@@ -23,13 +24,24 @@ func New(config ...Config) *fiber.App {
     }
 
     app := fiber.New(cfg.Fiber)
+
     db.Connect(cfg.DatabaseUrl)
+    redis.Register(cfg.Redis)
 
     app.Use(cors.Register())
-    app.Use(redis.Register(cfg.Redis))
-    app.Use(registerSiwx())
+    app.Use(localSiwx())
 
     setRoutes(app, cfg)
 
     return app
+}
+
+func localSiwx() fiber.Handler {
+    return func(c *fiber.Ctx) error {
+        s := session.Get(c)
+
+        c.Locals("siwx.user", s.User)
+
+        return c.Next()
+    }
 }
