@@ -69,3 +69,13 @@ func Delete(c *fiber.Ctx) {
     sessId := GetId(c)
     redis.Store.Delete(sessId)
 }
+
+func Register() fiber.Handler {
+    return func(c *fiber.Ctx) error {
+        s := Get(c)
+
+        c.Locals("siwx.user", s.User)
+
+        return c.Next()
+    }
+}

@@ -29,19 +29,9 @@ func New(config ...Config) *fiber.App {
     redis.Register(cfg.Redis)
 
     app.Use(cors.Register())
-    app.Use(localSiwx())
+    app.Use(session.Register())
 
     setRoutes(app, cfg)
 
     return app
-}
-
-func localSiwx() fiber.Handler {
-    return func(c *fiber.Ctx) error {
-        s := session.Get(c)
-
-        c.Locals("siwx.user", s.User)
-
-        return c.Next()
-    }
 }
