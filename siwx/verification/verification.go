@@ -50,7 +50,7 @@ func VerifyUser(message string, signature string) (*Verification, error) {
     `, strings.ToLower(address)).First(&userId).Error
 
     if err != nil || userId == "" {
-        var groupID int
+        var groupID string
 
         db.Connection.Raw(`
             SELECT id
@@ -61,7 +61,7 @@ func VerifyUser(message string, signature string) (*Verification, error) {
 
         db.Connection.Raw(`
             INSERT INTO users (id, group_id)
-            VALUES (gen_random_uuid(), ?, ?)
+            VALUES (gen_random_uuid(), ?)
             RETURNING id
         `, groupID).Scan(&userId)
 
