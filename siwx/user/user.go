@@ -8,7 +8,7 @@ import (
 )
 
 type User struct {
-    IsLoggedIn  bool                    `json:"-"`
+    IsLoggedIn  bool                    `json:"IsLoggedIn"`
     ID          string                  `json:"id"`
     Address     string                  `json:"address"`
     Permissions []string                `json:"permissions"`

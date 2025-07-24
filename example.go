@@ -13,7 +13,7 @@ import (
 func main() {
     env.Load()
 
-    app := siwx.New(siwx.Config{
+    app := siwx.NewFiber(siwx.Config{
         Fiber: fiber.Config{
             BodyLimit: 4 * 1024 * 1024,
         },
