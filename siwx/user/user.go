@@ -8,11 +8,11 @@ import (
 )
 
 type User struct {
-    IsLoggedIn  bool                    `json:"is-logged-in"`
+    IsLoggedIn  bool                    `json:"-"`
     ID          string                  `json:"id"`
     Address     string                  `json:"address"`
     Permissions []string                `json:"permissions"`
-    UserData    *map[string]interface{} `json:"user-data"`
+    UserData    *map[string]interface{} `json:"userData"`
 }
 
 var Unauthorized = User{
@@ -82,7 +82,7 @@ func GetByAddress(address string, getUserData *func(user User) map[string]interf
 
     var groupPermissions []dbPermission
     var userPermissions []dbPermission
-    var permissions []string
+    permissions := []string{}
 
     db.Connection.Raw(`
         SELECT p.id, p.name
