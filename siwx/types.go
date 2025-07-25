@@ -38,3 +38,5 @@ type Config struct {
     // Optional, default: nil
     GetUserData *func(user user.User) map[string]interface{}
 }
+
+var AppConfig Config

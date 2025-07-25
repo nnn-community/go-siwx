@@ -64,6 +64,25 @@ type dbPermission struct {
     Name string `json:"name"`
 }
 
+func GetByID(id string, getUserData *func(user User) map[string]interface{}) (User, error) {
+    var item dbUser
+
+    err := db.Connection.Raw(`
+        SELECT u.id, ua.address, u.group_id
+		FROM user_addresses ua
+		JOIN users u ON ua.user_id = u.id AND u.active = TRUE
+		LEFT JOIN "groups" g ON u.group_id = g.id
+		WHERE u.id = ?
+        LIMIT 1
+    `, id).First(&item).Error
+
+    if err != nil {
+        return Unauthorized, err
+    }
+
+    return parse(item, getUserData)
+}
+
 func GetByAddress(address string, getUserData *func(user User) map[string]interface{}) (User, error) {
     var item dbUser
 
@@ -80,6 +99,10 @@ func GetByAddress(address string, getUserData *func(user User) map[string]interf
         return Unauthorized, err
     }
 
+    return parse(item, getUserData)
+}
+
+func parse(item dbUser, getUserData *func(user User) map[string]interface{}) (User, error) {
     var groupPermissions []dbPermission
     var userPermissions []dbPermission
     permissions := []string{}

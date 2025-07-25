@@ -17,7 +17,7 @@ type siwxData struct {
     ChainId int    `json:"chainId"`
 }
 
-func setRoutes(app *fiber.App, cfg Config) {
+func setRoutes(app *fiber.App) {
     //
     // Get current logged user.
     //
@@ -54,7 +54,7 @@ func setRoutes(app *fiber.App, cfg Config) {
         }
 
         sid := session.GetId(c)
-        u, err := user.GetByAddress(v.Result.Address, cfg.GetUserData)
+        u, err := user.GetByAddress(v.Result.Address, AppConfig.GetUserData)
 
         if err != nil {
             return c.SendStatus(fiber.StatusUnauthorized)
@@ -62,8 +62,8 @@ func setRoutes(app *fiber.App, cfg Config) {
 
         var expiration time.Time
 
-        if cfg.CookieDuration > 0 {
-            expiration = time.Now().Add(cfg.CookieDuration)
+        if AppConfig.CookieDuration > 0 {
+            expiration = time.Now().Add(AppConfig.CookieDuration)
         }
 
         cookieCfg := fiber.Cookie{
@@ -79,8 +79,8 @@ func setRoutes(app *fiber.App, cfg Config) {
             cookieCfg.SameSite = "none"
         }
 
-        if !env.IsLocal() && cfg.CookieDomain != "" {
-            cookieCfg.Domain = cfg.CookieDomain
+        if !env.IsLocal() && AppConfig.CookieDomain != "" {
+            cookieCfg.Domain = AppConfig.CookieDomain
         }
 
         sessionData, _ := json.Marshal(session.Data{
@@ -90,7 +90,7 @@ func setRoutes(app *fiber.App, cfg Config) {
         })
 
         c.Cookie(&cookieCfg)
-        redis.Store.Set(sid, sessionData, cfg.CookieDuration)
+        redis.Store.Set(sid, sessionData, AppConfig.CookieDuration)
 
         return c.Status(fiber.StatusOK).JSON(true)
     })
@@ -100,7 +100,6 @@ func setRoutes(app *fiber.App, cfg Config) {
     //
     app.Delete("/siwx/session", func(c *fiber.Ctx) error {
         session.Delete(c)
-        c.Locals("siwx", nil)
 
         return c.Status(fiber.StatusOK).JSON(true)
     })
